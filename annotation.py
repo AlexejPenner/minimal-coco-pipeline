@@ -97,6 +97,7 @@ class COCODataset(BaseModel):
             licenses=self.licenses
         )
         assert len(reduced_dataset.images) == len(image_file_names)
+        assert all(ann.image_id in image_ids for ann in reduced_dataset.annotations)
         return reduced_dataset
 
     def resize_annotations_for_image(self, image_file_name: str, new_width: int, new_height: int) -> None:
@@ -165,6 +166,24 @@ class COCODataset(BaseModel):
         
         # Merge annotations
         self.annotations.extend(other.annotations)
+
+    def get_annotations_for_image(self, image_file_name: str) -> List[Annotation]:
+        """
+        Get all annotations for a specific image by its file name.
+        
+        Args:
+            image_file_name: The name of the image file to get annotations for
+            
+        Returns:
+            List of Annotation objects associated with the image
+        """
+        # First get the image ID for the given filename
+        image_id = self.get_image_id(image_file_name)
+        if image_id is None:
+            raise ValueError(f"Image with filename {image_file_name} not found")
+        
+        # Return all annotations that match the image ID
+        return [ann for ann in self.annotations if ann.image_id == image_id]
 
 def draw_annotations_on_image(
     image: PILImage.Image,

@@ -8,8 +8,14 @@ This is a simple project that shows how to use ZenML to transform a COCO dataset
 pip install -r requirements.txt
 ```
 
-## Run the pipeline
+## Run the training pipeline
 
 ```bash
-zenml run simple_cv_pipeline
+python process_and_training.py
+```
+
+## Run the inference pipeline
+
+```bash
+python inference.py
 ```
