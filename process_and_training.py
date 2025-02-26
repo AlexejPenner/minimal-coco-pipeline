@@ -516,4 +516,4 @@ def simple_cv_pipeline(num_chunks: int = 5, unique_id: str = uuid4().hex):
 
 
 if __name__ == "__main__":
-    simple_cv_pipeline(unique_id="cac33b66f5ff4c648fd8ea9fa4c86295")
+    simple_cv_pipeline()
