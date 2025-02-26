@@ -97,6 +97,10 @@ def inference(
     settings={
         "docker": DockerSettings(
             requirements="requirements.txt",
+            apt_packages=[
+                'libgl1-mesa-glx',
+                'libglib2.0-0'
+            ]
         ),
     },
 )

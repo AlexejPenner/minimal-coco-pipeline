@@ -94,7 +94,7 @@ def create_coco_dataset(output_root_dir: str) -> Tuple[
     url = "https://github.com/AlexejPenner/tiniest_coco/archive/refs/heads/main.zip"
     logging.info(f"Downloading dataset from {url}")
 
-    # Create temp dir for extraction
+    # Create temp dir for extraction - this tmp dir 
     tmp_dir = tempfile.mkdtemp()
     
     # Download and extract to temp dir
@@ -220,6 +220,7 @@ def transform(
 
     return output_dataset_path, chunk_annotations, annotated_image
 
+
 @step(enable_cache=True)
 def combine_step(
     step_prefix: str,
@@ -326,49 +327,6 @@ def combine_step(
     return register_artifact(yolo_dataset_dir, name="yolo_dataset").uri, visualize_folder_structure(yolo_dataset_dir)
 
 
-
-@step(
-    output_materializers={"yolo_model": UltralyticsMaterializer},
-)
-
-def training(yolo_dataset_dir: str, epochs: int = 1) -> Annotated[
-    YOLO, ArtifactConfig(
-        name="yolo_model",
-        artifact_type=ArtifactType.MODEL,
-    )
-    ]:
-    """
-    Trains a model on the given data source.
-
-    Args:
-        data_source: The path to the COCO dataset in the artifact store.
-
-    Returns:
-        The path to the created model in the artifact store.
-    """
-    logging.info(f"Starting training with data from: {yolo_dataset_dir}")    
-    
-
-    temp_dir = tempfile.mkdtemp()
-    copy_recursive(yolo_dataset_dir, temp_dir)
-
-    # Load and modify data.yaml path
-    yaml_path = os.path.join(temp_dir, "data.yaml")
-    with fileio.open(yaml_path) as f:
-        data_config = yaml.safe_load(f)
-    
-    data_config["path"] = temp_dir
-    
-    with fileio.open(yaml_path, "w") as f:
-        yaml.dump(data_config, f, sort_keys=False)
-
-    # traing yolo model
-    model = YOLO("yolo11n.pt")
-    model.train(data=os.path.join(temp_dir, "data.yaml"), epochs=epochs)
-
-    return model
-
-
 @step(enable_cache=True)
 def split_dataset(
     yolo_dataset_dir: str,
@@ -463,6 +421,47 @@ def split_dataset(
     return register_artifact(destination_dir, name="split_dataset").uri, visualize_folder_structure(destination_dir)
 
 
+@step(
+    output_materializers={"yolo_model": UltralyticsMaterializer},
+)
+def training(yolo_dataset_dir: str, epochs: int = 1) -> Annotated[
+    YOLO, ArtifactConfig(
+        name="yolo_model",
+        artifact_type=ArtifactType.MODEL,
+    )
+    ]:
+    """
+    Trains a model on the given data source.
+
+    Args:
+        data_source: The path to the COCO dataset in the artifact store.
+
+    Returns:
+        The path to the created model in the artifact store.
+    """
+    logging.info(f"Starting training with data from: {yolo_dataset_dir}")    
+    
+
+    temp_dir = tempfile.mkdtemp()
+    copy_recursive(yolo_dataset_dir, temp_dir)
+
+    # Load and modify data.yaml path
+    yaml_path = os.path.join(temp_dir, "data.yaml")
+    with fileio.open(yaml_path) as f:
+        data_config = yaml.safe_load(f)
+    
+    data_config["path"] = temp_dir
+    
+    with fileio.open(yaml_path, "w") as f:
+        yaml.dump(data_config, f, sort_keys=False)
+
+    # traing yolo model
+    model = YOLO("yolo11n.pt")
+    model.train(data=os.path.join(temp_dir, "data.yaml"), epochs=epochs)
+
+    return model
+
+
 @pipeline(
     enable_cache=True,
     model=Model(
@@ -472,10 +471,14 @@ def split_dataset(
     settings={
         "docker": DockerSettings(
             requirements="requirements.txt",
+            apt_packages=[
+                'libgl1-mesa-glx',
+                'libglib2.0-0'
+            ]
         ),
     },
 )
-def simple_cv_pipeline(num_chunks: int = 5, unique_id: str = uuid4().hex):
+def yolo_training_pipeline(num_chunks: int = 5, unique_id: str = uuid4().hex):
     """
     A simple pipeline to transform a COCO dataset and train a model on it.
     """
@@ -516,4 +519,4 @@ def simple_cv_pipeline(num_chunks: int = 5, unique_id: str = uuid4().hex):
 
 
 if __name__ == "__main__":
-    simple_cv_pipeline()
+    yolo_training_pipeline()

@@ -2,6 +2,8 @@
 
 This is a simple project that shows how to use ZenML to transform a COCO dataset and train a model on it.
 
+This project is mostly meant to showcase the capabilities of ZenML to handle complex data pipelines and model training. 
+
 ## Setup
 
 ```bash
