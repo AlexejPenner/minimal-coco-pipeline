@@ -4,7 +4,7 @@ from zenml import step, pipeline
 def my_step():
     print("Hello, world!")
 
-@pipeline
+@pipeline(enable_cache=False)
 def my_pipeline():
     my_step()
 
