@@ -36,6 +36,14 @@ jobs:
           echo "\nRemote Details:"
           git remote show origin || echo "No remote details available" 
 
+      - name: Get feature branch of zenml and install it
+        run: |
+          git clone https://github.com/zenml-io/zenml.git
+          cd zenml
+          git checkout bugfix/PRD-971-github
+          pip install -e .
+          cd ..
+          
       - name: set zenml stack
         run: |
           zenml init
