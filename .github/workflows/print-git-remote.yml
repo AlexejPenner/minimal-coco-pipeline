@@ -24,7 +24,11 @@ jobs:
         with:
           # Ensure all history is fetched to get remote info
           fetch-depth: 0
-      
+
+      - name: Pip install requirements
+        run: |
+          pip install -r requirements.txt
+
       - name: Print Git Remote
         run: |
           echo "Configured Git Remotes:"
@@ -35,6 +39,22 @@ jobs:
           
           echo "\nRemote Details:"
           git remote show origin || echo "No remote details available" 
+
+      - name: set zenml stack
+        run: |
+          zenml stack set zenml-full-gcp-stack
+
+      - name: run simple pipeline
+        run: |
+          python simple_pipeline.py
+
+      - name: Get feature branch of zenml and install it
+        run: |
+          git clone https://github.com/zenml-io/zenml.git
+          cd zenml
+          git checkout bugfix/PRD-971-github
+          pip install -e .
+          cd ..
       
       - name: run simple pipeline
         run: |
