@@ -1,0 +1,32 @@
+name: Print Git Remote
+
+on:
+  # Trigger the workflow on push or pull request events
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  # Allow workflow to be triggered manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  print-remote:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          # Ensure all history is fetched to get remote info
+          fetch-depth: 0
+      
+      - name: Print Git Remote
+        run: |
+          echo "Configured Git Remotes:"
+          git remote -v
+          
+          echo "\nDefault Remote URL:"
+          git remote get-url origin || echo "No default remote URL found"
+          
+          echo "\nRemote Details:"
+          git remote show origin || echo "No remote details available" 
