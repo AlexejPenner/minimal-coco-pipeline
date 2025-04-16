@@ -38,11 +38,12 @@ jobs:
 
       - name: Get feature branch of zenml and install it
         run: |
+          cd ..
           git clone https://github.com/zenml-io/zenml.git
           cd zenml
           git checkout bugfix/PRD-971-github
           pip install -e .
-          cd ..
+          cd ../repo
 
       - name: set zenml stack
         run: |
