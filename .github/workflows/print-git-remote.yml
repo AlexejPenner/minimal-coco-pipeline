@@ -13,6 +13,11 @@ jobs:
   print-remote:
     runs-on: ubuntu-latest
     
+    # Define environment variables at the job level from GitHub secrets
+    env:
+      ZENML_STORE_URL: ${{ secrets.ZENML_STORE_URL }}
+      ZENML_STORE_API_KEY: ${{ secrets.ZENML_STORE_API_KEY }}
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -30,3 +35,7 @@ jobs:
           
           echo "\nRemote Details:"
           git remote show origin || echo "No remote details available" 
+      
+      - name: run simple pipeline
+        run: |
+          python simple_pipeline.py
