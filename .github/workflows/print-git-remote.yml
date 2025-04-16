@@ -43,12 +43,12 @@ jobs:
           git checkout bugfix/PRD-971-github
           pip install -e .
           cd ..
-          
+
       - name: set zenml stack
         run: |
           zenml init
           zenml stack set zenml-full-gcp-stack
-          zenml integration install gcp -y
+          zenml integration install gcp github -y
           zenml project set default
       
       - name: run simple pipeline
