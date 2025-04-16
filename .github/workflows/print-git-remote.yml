@@ -27,7 +27,7 @@ jobs:
 
       - name: Pip install requirements
         run: |
-          pip install -r requirements.txt
+          pip install zenml
 
       - name: Print Git Remote
         run: |
