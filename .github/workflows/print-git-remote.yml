@@ -43,7 +43,7 @@ jobs:
           cd zenml
           git checkout bugfix/PRD-971-github
           pip install -e .
-          cd ../repo
+          cd ../${{ github.event.repository.name }}
 
       - name: set zenml stack
         run: |
