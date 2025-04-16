@@ -43,7 +43,7 @@ jobs:
       - name: set zenml stack
         run: |
           zenml stack set zenml-full-gcp-stack
-          zenml integration install gcp
+          zenml integration install gcp -y
 
       - name: run simple pipeline
         run: |
